@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>نظم الغابات في إفريقيا | التطبيق التعليمي التفاعلي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+          },
+          colors: {
+            forest: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+            },
+            med: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #f3f8f4;
+      color: #1e293b;
+      overflow-x: hidden;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pulse-hotspot {
+      animation: pulseHotspot 2s infinite;
+      transform-origin: center;
+      transform-box: fill-box;
+    }
+
+    @keyframes pulseHotspot {
+      0% { transform: scale(0.95); opacity: 0.85; }
+      50% { transform: scale(1.2); opacity: 0.35; }
+      100% { transform: scale(0.95); opacity: 0.85; }
+    }
+
+    .interactive-card {
+      transition: all 0.2s ease;
+    }
+
+    .interactive-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.14);
+    }
+
+    #balance-beam {
+      transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-origin: 180px 75px;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #certificate-area, #certificate-area * { visibility: visible; }
+      #certificate-area {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        border: 6px solid #15803d !important;
+      }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col pb-16">
+
+  <!-- الشريط العلوي -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-forest-200 no-print">
+    <div class="max-w-6xl mx-auto px-4 py-3">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-forest-600 to-emerald-700 text-white flex items-center justify-center shadow text-xl">
+            <i class="fa-solid fa-earth-africa"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-forest-100 text-forest-800">
+                الصف الخامس الابتدائي • الوحدة الثالثة
+              </span>
+            </div>
+            <h1 class="text-base sm:text-xl font-black text-slate-900 mt-0.5">
+              نظم الغابات في إفريقيا
+            </h1>
+          </div>
+        </div>
+
+        <!-- النقاط والتقدم -->
+        <div class="flex items-center gap-2.5">
+          <div class="flex items-center gap-2 bg-amber-50 border border-amber-300 px-3 py-1.5 rounded-2xl">
+            <span>⭐</span>
+            <div>
+              <div class="text-[10px] font-bold text-amber-800 leading-none">نقاطك</div>
+              <div id="xp-counter" class="text-sm font-black text-amber-900">10 نقطة</div>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 px-3 py-1.5 rounded-2xl border border-slate-200 flex items-center gap-2">
+            <div>
+              <div class="text-[10px] font-bold text-slate-500 leading-none">التقدم</div>
+              <div id="progress-text" class="text-xs font-black text-forest-700 mt-0.5">10%</div>
+            </div>
+            <div class="w-20 sm:w-24 h-2.5 bg-slate-200 rounded-full overflow-hidden">
+              <div id="progress-bar" class="h-full bg-forest-600 rounded-full transition-all duration-300" style="width: 10%;"></div>
+            </div>
+          </div>
+
+          <button type="button" onclick="toggleModal('quick-summary-modal')" class="bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs px-3.5 py-2.5 rounded-2xl shadow transition cursor-pointer">
+            ملخص الدرس
+          </button>
+        </div>
+      </div>
+
+      <!-- تبويبات المحطات الخمس -->
+      <nav aria-label="أقسام الدرس" class="mt-3 flex items-center gap-2 overflow-x-auto pb-1">
+        <button type="button" onclick="switchTab(0)" id="nav-btn-0" class="nav-tab flex-shrink-0 px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-forest-600 text-white shadow cursor-pointer">
+          1. النظام البيئي والفيديو
+        </button>
+        <button type="button" onclick="switchTab(1)" id="nav-btn-1" class="nav-tab flex-shrink-0 px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-slate-100 text-slate-700 hover:bg-forest-50 cursor-pointer">
+          2. الغابات المدارية المطيرة
+        </button>
+        <button type="button" onclick="switchTab(2)" id="nav-btn-2" class="nav-tab flex-shrink-0 px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-slate-100 text-slate-700 hover:bg-med-50 cursor-pointer">
+          3. غابات البحر المتوسط والمقارنة
+        </button>
+        <button type="button" onclick="switchTab(3)" id="nav-btn-3" class="nav-tab flex-shrink-0 px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-slate-100 text-slate-700 hover:bg-rose-50 cursor-pointer">
+          4. الأخطار وبنك الأسئلة
+        </button>
+        <button type="button" onclick="switchTab(4)" id="nav-btn-4" class="nav-tab flex-shrink-0 px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-slate-100 text-slate-700 hover:bg-amber-50 cursor-pointer">
+          5. تحدي الأبطال (12 سؤالاً) 🏆
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- إشعار سفلي بسيط -->
+  <div id="live-toast" class="hidden fixed bottom-4 left-4 right-4 sm:right-auto sm:max-w-md z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl border border-emerald-500/40 flex items-center justify-between gap-3 no-print">
+    <span id="live-toast-text" class="text-xs sm:text-sm font-extrabold"></span>
+    <button type="button" onclick="hideToast()" class="text-xs text-slate-300 hover:text-white px-2 py-0.5 rounded-lg bg-white/10 cursor-pointer">إغلاق</button>
+  </div>
+
+  <!-- المحتوى الرئيسي -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
+
+    <!-- المحطة 1: الفيديو والنظام البيئي -->
+    <section id="station-0" class="station-panel fade-in space-y-6">
+      <!-- فيديو الدرس من يوتيوب -->
+      <div class="bg-slate-900 text-white rounded-3xl p-5 sm:p-6 shadow-xl border border-emerald-700/50 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-red-600 text-white flex items-center justify-center text-xl shadow">
+              <i class="fa-brands fa-youtube"></i>
+            </div>
+            <div>
+              <span class="bg-emerald-500/20 text-emerald-300 text-xs font-extrabold px-2.5 py-0.5 rounded-full">فيديو الدرس</span>
+              <h2 class="text-lg sm:text-xl font-black mt-0.5">نظم الغابات في إفريقيا — شرح الفيديو</h2>
+            </div>
+          </div>
+
+          <a href="https://www.youtube.com/watch?v=2mXlycB3WXc" target="_blank" rel="noopener noreferrer" onclick="registerInteraction('open_yt_top', 5);" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-extrabold px-4 py-2.5 rounded-xl flex items-center gap-2 transition">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            <span>فتح على يوتيوب</span>
+          </a>
+        </div>
+
+        <div class="rounded-2xl overflow-hidden bg-black border border-slate-700">
+          <div class="aspect-video w-full">
+            <iframe
+              id="lesson-youtube-iframe"
+              class="w-full h-full"
+              src="https://www.youtube.com/embed/2mXlycB3WXc?rel=0&modestbranding=1&playsinline=1"
+              title="فيديو نظم الغابات في إفريقيا"
+              frameborder="0"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <div class="bg-slate-950 px-4 py-2.5 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span class="text-slate-300 font-bold">إذا لم يفتح داخل الصفحة يمكنك تبديل المشغل أو فتحه على يوتيوب:</span>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="switchYoutubeHost()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 font-extrabold px-3 py-1.5 rounded-lg border border-slate-600 cursor-pointer">
+                تبديل مشغل الفيديو
+              </button>
+              <a href="https://www.youtube.com/watch?v=2mXlycB3WXc" target="_blank" rel="noopener noreferrer" onclick="registerInteraction('open_yt_bar', 5);" class="bg-red-600 hover:bg-red-500 text-white font-extrabold px-3 py-1.5 rounded-lg">
+                يوتيوب ↗
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- تعريف النظام البيئي -->
+      <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h3 class="text-xl font-black text-slate-900">أولاً: ما المقصود بالنظام البيئي؟</h3>
+          <button type="button" onclick="toggleModal('forest-def-modal')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 font-extrabold text-xs px-3.5 py-2 rounded-xl cursor-pointer">
+            💡 تعريف الغابة
+          </button>
+        </div>
+
+        <div onclick="toggleEcosystemExample()" class="interactive-card cursor-pointer bg-forest-50 border-2 border-forest-200 rounded-2xl p-5 space-y-3">
+          <p class="text-slate-900 font-extrabold text-base sm:text-lg leading-relaxed">
+            🌿 <strong>النظام البيئي:</strong> منطقة جغرافية متكاملة تضم <strong>مكونات حية</strong> و<strong>مكونات غير حية</strong>، تتفاعل مع بعضها وفق نظام دقيق للحفاظ على <strong>التوازن البيئي واستدامة الحياة</strong>.
+          </p>
+          <div class="flex items-center justify-between text-xs font-extrabold text-forest-800 pt-2 border-t border-forest-200">
+            <span>انقر لعرض مثال تطبيقي على التفاعل داخل الغابة</span>
+            <span id="eco-example-toggle-icon" class="bg-forest-600 text-white px-2.5 py-1 rounded-lg">عرض المثال</span>
+          </div>
+          <div id="eco-example-box" class="hidden bg-white p-4 rounded-xl border border-forest-200 text-sm font-bold text-slate-700 leading-relaxed fade-in">
+            في الغابة، تتفاعل <strong>النباتات</strong> (مكون حي) مع <strong>الماء والتربة والضوء</strong> (مكونات غير حية) لتنمو، وتتغذى عليها <strong>الحيوانات</strong>، وتقوم <strong>الكائنات الدقيقة</strong> بتحليل المواد العضوية.
+          </div>
+        </div>
+      </div>
+
+      <!-- مختبر تصنيف المكونات -->
+      <div class="bg-white rounded-3xl p-6 shadow-md border-2 border-indigo-200 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-xl font-black text-slate-900">مختبر تصنيف مكونات النظام البيئي</h3>
+            <p class="text-xs text-slate-600 font-bold">اختر عنصراً من البنك ثم اضغط على السلة المناسبة له</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="classifier-score" class="bg-indigo-100 text-indigo-900 font-black text-xs px-3 py-1.5 rounded-xl">تم تصنيف: 0 / 7</span>
+            <button type="button" onclick="resetClassifier()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3 py-1.5 rounded-xl cursor-pointer">
+              إعادة
+            </button>
+          </div>
+        </div>
+
+        <div id="classifier-bank" class="flex flex-wrap gap-2.5 bg-slate-50 p-4 rounded-2xl border border-slate-200 min-h-[60px]"></div>
+        <div id="classifier-feedback" class="hidden text-center text-sm font-extrabold py-2.5 px-4 rounded-xl"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div onclick="dropIntoBucket('biotic')" class="interactive-card cursor-pointer rounded-2xl border-2 border-dashed border-emerald-500 bg-emerald-50/70 hover:bg-emerald-100/80 p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-black text-emerald-900 text-base">🦁 المكونات الحية</span>
+              <span class="text-xs font-bold bg-emerald-600 text-white px-2.5 py-0.5 rounded-full">اضغط هنا</span>
+            </div>
+            <div id="bucket-biotic" class="flex flex-wrap gap-2 min-h-[40px]"></div>
+          </div>
+
+          <div onclick="dropIntoBucket('abiotic')" class="interactive-card cursor-pointer rounded-2xl border-2 border-dashed border-sky-500 bg-sky-50/70 hover:bg-sky-100/80 p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-black text-sky-900 text-base">☀️ المكونات غير الحية</span>
+              <span class="text-xs font-bold bg-sky-600 text-white px-2.5 py-0.5 rounded-full">اضغط هنا</span>
+            </div>
+            <div id="bucket-abiotic" class="flex flex-wrap gap-2 min-h-[40px]"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- أنواع النظم البيئية وتفاوت الأحجام -->
+      <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-4">
+        <h3 class="text-xl font-black text-slate-900">أنواع النظم البيئية وتفاوت أحجامها</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div onclick="toggleAccordion('acc-land', 'icon-acc-land')" class="interactive-card cursor-pointer rounded-2xl bg-emerald-50 border-2 border-emerald-200 p-4 space-y-2">
+            <div class="flex items-center justify-between text-emerald-900 font-black">
+              <span>🌲 النظم الأرضية (البرية)</span>
+              <i id="icon-acc-land" class="fa-solid fa-chevron-up text-sm"></i>
+            </div>
+            <div id="acc-land" class="pt-2 border-t border-emerald-200 text-sm font-bold text-slate-700 space-y-1">
+              <div>• الغابات</div>
+              <div>• الحشائش</div>
+              <div>• الصحاري</div>
+            </div>
+          </div>
+
+          <div onclick="toggleAccordion('acc-water', 'icon-acc-water')" class="interactive-card cursor-pointer rounded-2xl bg-sky-50 border-2 border-sky-200 p-4 space-y-2">
+            <div class="flex items-center justify-between text-sky-900 font-black">
+              <span>🌊 النظم المائية</span>
+              <i id="icon-acc-water" class="fa-solid fa-chevron-up text-sm"></i>
+            </div>
+            <div id="acc-water" class="pt-2 border-t border-sky-200 text-sm font-bold text-slate-700 space-y-1">
+              <div>• النظم البيئية للمياه العذبة</div>
+              <div>• النظم البيئية للمياه المالحة</div>
+            </div>
+          </div>
+
+          <div onclick="toggleAccordion('acc-human', 'icon-acc-human')" class="interactive-card cursor-pointer rounded-2xl bg-amber-50 border-2 border-amber-200 p-4 space-y-2">
+            <div class="flex items-center justify-between text-amber-900 font-black">
+              <span>🏙️ النظم البشرية</span>
+              <i id="icon-acc-human" class="fa-solid fa-chevron-up text-sm"></i>
+            </div>
+            <div id="acc-human" class="pt-2 border-t border-amber-200 text-sm font-bold text-slate-700 space-y-1">
+              <div>• المناطق العمرانية</div>
+              <div>• الأراضي الزراعية</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <button type="button" onclick="showSizeDetail('small')" class="p-3 rounded-xl bg-white hover:bg-sky-50 border border-slate-200 text-center cursor-pointer">
+              <div class="text-2xl">💧</div>
+              <div class="font-black text-sky-800 text-sm">صغير المساحة</div>
+              <div class="text-xs font-bold text-slate-600">بركة المياه</div>
+            </button>
+            <button type="button" onclick="showSizeDetail('large')" class="p-3 rounded-xl bg-white hover:bg-emerald-50 border border-emerald-300 text-center cursor-pointer">
+              <div class="text-2xl">🌴</div>
+              <div class="font-black text-emerald-800 text-sm">كبير المساحة</div>
+              <div class="text-xs font-bold text-slate-600">الغابات المدارية المطيرة</div>
+            </button>
+            <button type="button" onclick="showSizeDetail('largest')" class="p-3 rounded-xl bg-forest-700 text-white text-center shadow cursor-pointer">
+              <div class="text-2xl">🌍</div>
+              <div class="font-black text-sm">أكبر النظم البيئية</div>
+              <div class="text-xs font-bold text-emerald-100">الغلاف الحيوي للأرض</div>
+            </button>
+          </div>
+          <div id="size-detail-banner" class="mt-3 text-center text-xs sm:text-sm font-extrabold text-forest-900 bg-forest-100/80 py-2 px-3 rounded-xl">
+            يتفاوت حجم النظم البيئية في العالم من بركة مياه صغيرة إلى الغلاف الحيوي للأرض كأكبر نظام بيئي.
+          </div>
+        </div>
+      </div>
+
+      <!-- ميزان التوازن البيئي -->
+      <div class="bg-white rounded-3xl p-6 shadow-md border-2 border-amber-300 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-xl font-black text-slate-900">⚖️ التوازن البيئي وأسباب اختلاله</h3>
+            <p class="text-xs sm:text-sm text-slate-600 font-bold mt-1">
+              <strong>التوازن البيئي:</strong> حالة من الاستقرار تحدث داخل النظم البيئية عبر التفاعل بين مكوناتها الحية وغير الحية، مما يمنع حدوث تغييرات جذرية وغير طبيعية فيها.
+            </p>
+          </div>
+          <button type="button" onclick="restoreEcoBalance()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow cursor-pointer">
+            استعادة التوازن البيئي
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-5 bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-col items-center">
+            <svg viewBox="0 0 360 190" class="w-full max-w-[320px] h-auto" aria-label="ميزان التوازن البيئي">
+              <rect x="130" y="165" width="100" height="14" rx="6" fill="#334155" />
+              <rect x="172" y="75" width="16" height="92" rx="4" fill="#475569" />
+              <g id="balance-beam">
+                <rect x="40" y="70" width="280" height="10" rx="5" fill="#d97706" />
+                <line x1="65" y1="80" x2="45" y2="120" stroke="#64748b" stroke-width="2" />
+                <line x1="65" y1="80" x2="85" y2="120" stroke="#64748b" stroke-width="2" />
+                <path d="M35,120 Q65,138 95,120 Z" fill="#ef4444" />
+                <text x="65" y="148" text-anchor="middle" fill="#991b1b" font-size="10" font-weight="bold">أسباب بشرية</text>
+
+                <line x1="295" y1="80" x2="275" y2="120" stroke="#64748b" stroke-width="2" />
+                <line x1="295" y1="80" x2="315" y2="120" stroke="#64748b" stroke-width="2" />
+                <path d="M265,120 Q295,138 325,120 Z" fill="#f59e0b" />
+                <text x="295" y="148" text-anchor="middle" fill="#92400e" font-size="10" font-weight="bold">أسباب طبيعية</text>
+              </g>
+              <circle cx="180" cy="75" r="11" fill="#15803d" stroke="#ffffff" stroke-width="3" />
+            </svg>
+            <div id="balance-status-box" class="mt-2 text-center bg-emerald-100 text-emerald-900 border border-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-black w-full">
+              ✅ النظام البيئي في حالة توازن واستقرار
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 space-y-4">
+            <div>
+              <div class="text-xs font-extrabold text-amber-800 mb-2">أسباب طبيعية:</div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button type="button" onclick="triggerDisruption('natural', 'الزلازل سبب طبيعي لاختلال التوازن البيئي.')" class="p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-xs font-extrabold text-amber-950 cursor-pointer">الزلازل</button>
+                <button type="button" onclick="triggerDisruption('natural', 'الثورانات البركانية سبب طبيعي لاختلال التوازن البيئي.')" class="p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-xs font-extrabold text-amber-950 cursor-pointer">الثورانات البركانية</button>
+                <button type="button" onclick="triggerDisruption('natural', 'الأعاصير سبب طبيعي لاختلال التوازن البيئي.')" class="p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-xs font-extrabold text-amber-950 cursor-pointer">الأعاصير</button>
+                <button type="button" onclick="triggerDisruption('natural', 'الحرائق الطبيعية سبب طبيعي لاختلال التوازن البيئي.')" class="p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-xs font-extrabold text-amber-950 cursor-pointer">الحرائق الطبيعية</button>
+              </div>
+            </div>
+
+            <div>
+              <div class="text-xs font-extrabold text-rose-800 mb-2">أسباب بشرية:</div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <button type="button" onclick="triggerDisruption('human', 'إزالة الغابات سبب بشري لاختلال التوازن البيئي.')" class="p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-300 text-xs font-extrabold text-rose-950 cursor-pointer">إزالة الغابات</button>
+                <button type="button" onclick="triggerDisruption('human', 'الرعي الجائر سبب بشري لاختلال التوازن البيئي.')" class="p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-300 text-xs font-extrabold text-rose-950 cursor-pointer">الرعي الجائر</button>
+                <button type="button" onclick="triggerDisruption('human', 'التوسع العمراني سبب بشري لاختلال التوازن البيئي.')" class="p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-300 text-xs font-extrabold text-rose-950 cursor-pointer">التوسع العمراني</button>
+                <button type="button" onclick="triggerDisruption('human', 'الحروب سبب بشري لاختلال التوازن البيئي.')" class="p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-300 text-xs font-extrabold text-rose-950 cursor-pointer">الحروب</button>
+                <button type="button" onclick="triggerDisruption('human', 'استخدام المواد الكيماوية والمبيدات الحشرية سبب بشري.')" class="p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-300 text-xs font-extrabold text-rose-950 cursor-pointer">الكيماويات والمبيدات</button>
+                <button type="button" onclick="triggerDisruption('human', 'التلوث المائي والهوائي سبب بشري لاختلال التوازن البيئي.')" class="p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-300 text-xs font-extrabold text-rose-950 cursor-pointer">التلوث المائي والهوائي</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <button type="button" onclick="switchTab(1)" class="bg-forest-600 hover:bg-forest-700 text-white font-black px-6 py-3 rounded-2xl shadow cursor-pointer">
+          التالي: الغابات المدارية المطيرة ←
+        </button>
+      </div>
+    </section>
+
+    <!-- المحطة 2: نظام الغابات المدارية المطيرة -->
+    <section id="station-1" class="station-panel hidden fade-in space-y-6">
+      <div class="bg-gradient-to-l from-forest-800 to-emerald-700 text-white rounded-3xl p-6 shadow-lg">
+        <span class="bg-white/20 text-xs font-extrabold px-3 py-1 rounded-full">أ — نظام الغابات المدارية المطيرة (الاستوائية)</span>
+        <h2 class="text-2xl sm:text-3xl font-black mt-2">الغابات المدارية المطيرة في قارة إفريقيا</h2>
+        <p class="text-emerald-100 text-sm font-bold mt-1">تمتد بين دائرتي عرض ١٠° شمالاً و١٠° جنوباً</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-4">
+          <h3 class="text-xl font-black text-forest-900">١. الموقع الفلكي والجغرافي</h3>
+          <div class="p-4 rounded-2xl bg-forest-50 border border-forest-200 text-sm font-extrabold text-slate-800">
+            <strong>الموقع الفلكي:</strong> يمتد بشكل رئيسي في قارة إفريقيا بين دائرتي عرض <strong>١٠° شمالاً و١٠° جنوباً</strong>.
+          </div>
+          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-sm font-bold text-slate-800 space-y-1.5">
+            <div class="font-black text-emerald-900">الموقع الجغرافي:</div>
+            <div>• <strong>وسط القارة:</strong> بشمال حوض نهر الكونغو.</div>
+            <div>• <strong>غرب القارة:</strong> بساحل غانا.</div>
+            <div>• <strong>مناطق بعيدة نسبياً عن دائرة الاستواء:</strong> مثل الجزء الشرقي من جزيرة مدغشقر.</div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-md border border-forest-200 space-y-3">
+          <h3 class="text-base sm:text-lg font-black text-forest-900">خريطة توزيع الغابات المدارية المطيرة (اضغط على النقاط)</h3>
+          <svg viewBox="0 0 360 310" class="w-full h-auto rounded-2xl bg-sky-50 border border-sky-200">
+            <rect width="360" height="310" fill="#e0f2fe" />
+            <text x="180" y="22" text-anchor="middle" fill="#0369a1" font-size="12" font-weight="bold">البحر المتوسط</text>
+            <path d="M105,45 L205,45 L240,72 L262,115 L240,168 L215,232 L188,268 L168,265 L160,210 L130,168 L85,142 L78,105 L96,70 Z" fill="#fef9c3" stroke="#78716c" stroke-width="2" />
+            <path d="M252,196 L270,178 L272,222 L254,236 Z" fill="#fef9c3" stroke="#78716c" stroke-width="1.6" />
+            <line x1="20" y1="148" x2="340" y2="148" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="5,4" />
+            <text x="26" y="143" fill="#0284c7" font-size="10" font-weight="bold">دائرة الاستواء °٠</text>
+            <path d="M120,136 Q162,130 202,138 Q206,158 186,168 Q154,165 124,152 Z" fill="#22c55e" fill-opacity="0.78" stroke="#15803d" stroke-width="1.5" />
+            <path d="M265,185 L271,182 L272,218 L266,222 Z" fill="#22c55e" fill-opacity="0.88" />
+
+            <g class="cursor-pointer" onclick="updateTropicalPin('congo')">
+              <circle cx="176" cy="152" r="11" fill="#ef4444" opacity="0.35" class="pulse-hotspot" />
+              <circle cx="176" cy="152" r="6.5" fill="#dc2626" stroke="#fff" stroke-width="2" />
+              <text x="176" y="180" text-anchor="middle" fill="#14532d" font-size="10" font-weight="bold">شمال حوض الكونغو</text>
+            </g>
+
+            <g class="cursor-pointer" onclick="updateTropicalPin('ghana')">
+              <circle cx="126" cy="142" r="11" fill="#f97316" opacity="0.35" class="pulse-hotspot" />
+              <circle cx="126" cy="142" r="6.5" fill="#ea580c" stroke="#fff" stroke-width="2" />
+              <text x="102" y="130" text-anchor="middle" fill="#7c2d12" font-size="10" font-weight="bold">ساحل غانا</text>
+            </g>
+
+            <g class="cursor-pointer" onclick="updateTropicalPin('madagascar')">
+              <circle cx="269" cy="202" r="11" fill="#8b5cf6" opacity="0.35" class="pulse-hotspot" />
+              <circle cx="269" cy="202" r="6.5" fill="#7c3aed" stroke="#fff" stroke-width="2" />
+              <text x="298" y="205" text-anchor="middle" fill="#4c1d95" font-size="9.5" font-weight="bold">شرق مدغشقر</text>
+            </g>
+          </svg>
+          <div id="tropical-pin-info" class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs sm:text-sm font-extrabold text-emerald-950">
+            📍 اضغط على إحدى النقاط على الخريطة لمعرفة تفاصيل الموقع الجغرافي.
+          </div>
+        </div>
+      </div>
+
+      <!-- الخصائص المناخية والنباتية والحيوانية والتربة والأهمية -->
+      <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-4">
+        <h3 class="text-xl font-black text-forest-900">٢. الخصائص المناخية والمفاهيم</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-bold text-slate-800">
+          <div class="p-4 rounded-2xl bg-sky-50 border border-sky-200">
+            <div class="font-black text-sky-900 mb-1">أ — المطر الغزير طوال العام</div>
+            <p>تتساقط الأمطار الغزيرة على مدار العام.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200">
+            <div class="font-black text-amber-900 mb-1">ب — ارتفاع درجات الحرارة طوال العام</div>
+            <p><strong>ما النتائج؟</strong> ترتب على ذلك <strong>انخفاض المدى الحراري السنوي</strong>.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+            <div class="font-black text-emerald-900 mb-1">ج — انخفاض الضغط الجوي</div>
+            <p><strong>بم تفسر؟</strong> بسبب <strong>صعود الهواء إلى أعلى</strong> و<strong>سكون حركة الرياح نسبياً</strong>.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-teal-50 border border-teal-200">
+            <div class="font-black text-teal-900 mb-1">د — ارتفاع الرطوبة النسبية</div>
+            <p><strong>بم تفسر؟</strong> بسبب <strong>كثرة التبخر</strong>.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+          <div class="p-4 rounded-2xl bg-slate-900 text-white text-xs sm:text-sm font-bold">
+            <div class="text-amber-300 font-black mb-1">المدى الحراري السنوي:</div>
+            الفرق بين متوسط درجة الحرارة بالنسبة لأعلى شهور السنة وأدنى شهور السنة حرارة.
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-900 text-white text-xs sm:text-sm font-bold">
+            <div class="text-sky-300 font-black mb-1">الرطوبة النسبية:</div>
+            نسبة كمية بخار الماء الموجودة في الهواء بالنسبة إلى كمية بخار الماء التي يستطيع الهواء أن يحملها.
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-2.5 text-sm font-bold text-slate-800">
+          <h4 class="text-lg font-black text-forest-900">🌳 ٣. الخصائص النباتية</h4>
+          <p>• من أكثر النظم البيئية تنوعاً؛ يحتوي على آلاف الأنواع من النباتات والحيوانات.</p>
+          <p>• غابات كثيفة الأشجار ومتشابكة الأغصان؛ منع ذلك وصول الضوء لأرض الغابة فكثرت <strong>النباتات المتسلقة والطفيلية</strong>.</p>
+          <p class="p-3 rounded-xl bg-forest-50 text-forest-950 font-extrabold">أشهر الأشجار: الماهوجني — الأبنوس — المطاط — الكاكاو — الموز — المانجو.</p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-2.5 text-sm font-bold text-slate-800">
+          <h4 class="text-lg font-black text-forest-900">🐒 ٤. الحيوانات</h4>
+          <p>• تتميز بكثرة الحيوانات مثل: <strong>القردة والنمور</strong>، <strong>التماسيح والأفاعي</strong>، والحشرات مثل <strong>النمل الأبيض</strong>.</p>
+          <p class="p-3 rounded-xl bg-amber-50 text-amber-950 font-extrabold">بم تفسر: تندر الحيوانات الضخمة آكلة العشب بسبب صعوبة تحركها بين أشجار الغابة.</p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-2.5 text-sm font-bold text-slate-800">
+          <h4 class="text-lg font-black text-forest-900">🪨 ٥. التربة</h4>
+          <p>• معظمها <strong>حمراء اللون</strong> لأنها غنية بأكاسيد الحديد وفقيرة في الأملاح المعدنية القابلة للذوبان.</p>
+          <p>• تنمو بها النباتات والأشجار الكثيفة بسبب غزارة الأمطار وارتفاع درجة الحرارة وسرعة التفاعلات الكيميائية وتحلل المواد العضوية.</p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-2.5 text-sm font-bold text-slate-800">
+          <h4 class="text-lg font-black text-forest-900">💎 ٦. الأهمية الاقتصادية والبيئية</h4>
+          <p>• <strong>اقتصادياً:</strong> مواد خام (الأدوية، الصناعات الخشبية، المطاط)، غذاء ووقود للسكان، وأهمية سياحية.</p>
+          <p>• <strong>بيئياً:</strong> تحافظ على التوازن البيئي وتنقي البيئة من التلوث؛ تمتص غابات حوض الكونغو انبعاثات الكربون بكمية أكبر من الصادرة عن إفريقيا بأكملها وتنتج الأكسجين.</p>
+        </div>
+      </div>
+
+      <div class="flex justify-between">
+        <button type="button" onclick="switchTab(0)" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-black px-5 py-3 rounded-2xl cursor-pointer">
+          → المحطة 1
+        </button>
+        <button type="button" onclick="switchTab(2)" class="bg-med-600 hover:bg-med-700 text-white font-black px-6 py-3 rounded-2xl shadow cursor-pointer">
+          التالي: غابات البحر المتوسط والمقارنة ←
+        </button>
+      </div>
+    </section>
+
+    <!-- المحطة 3: غابات البحر المتوسط والمقارنة -->
+    <section id="station-2" class="station-panel hidden fade-in space-y-6">
+      <div class="bg-gradient-to-l from-amber-700 to-med-700 text-white rounded-3xl p-6 shadow-lg">
+        <span class="bg-white/20 text-xs font-extrabold px-3 py-1 rounded-full">ب — نظام غابات البحر المتوسط</span>
+        <h2 class="text-2xl sm:text-3xl font-black mt-2">غابات البحر المتوسط في قارة إفريقيا</h2>
+        <p class="text-amber-100 text-sm font-bold mt-1">تمتد بين دائرتي عرض ٣٠° و٤٥° شمالاً وجنوباً</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-4">
+          <h3 class="text-xl font-black text-slate-900">١. الموقع الفلكي والجغرافي</h3>
+          <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-sm font-extrabold text-slate-800">
+            <strong>الموقع الفلكي:</strong> يمتد حول سواحل البحر المتوسط وعلى السواحل الغربية للقارات بين دائرتي عرض <strong>٣٠° و٤٥° شمالاً وجنوباً</strong>.
+          </div>
+          <div class="p-4 rounded-2xl bg-med-50 border border-med-200 text-sm font-bold text-slate-800 space-y-1.5">
+            <div class="font-black text-med-800">الموقع الجغرافي في إفريقيا:</div>
+            <div>• على طول <strong>الساحل الشمالي الغربي</strong> لقارة إفريقيا.</div>
+            <div>• <strong>منطقة الكاب</strong> أقصى جنوب قارة إفريقيا.</div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-md border border-amber-200 space-y-3">
+          <h3 class="text-base sm:text-lg font-black text-slate-900">خريطة توزيع غابات البحر المتوسط (اضغط على النقاط)</h3>
+          <svg viewBox="0 0 360 310" class="w-full h-auto rounded-2xl bg-sky-50 border border-sky-200">
+            <rect width="360" height="310" fill="#e0f2fe" />
+            <text x="180" y="22" text-anchor="middle" fill="#0369a1" font-size="12" font-weight="bold">البحر المتوسط</text>
+            <path d="M105,45 L205,45 L240,72 L262,115 L240,168 L215,232 L188,268 L168,265 L160,210 L130,168 L85,142 L78,105 L96,70 Z" fill="#fef9c3" stroke="#78716c" stroke-width="2" />
+            <path d="M252,196 L270,178 L272,222 L254,236 Z" fill="#fef9c3" stroke="#78716c" stroke-width="1.6" />
+            <path d="M98,55 Q138,46 178,48" fill="none" stroke="#f59e0b" stroke-width="7" stroke-linecap="round" />
+            <path d="M175,264 Q188,270 200,262" fill="none" stroke="#f59e0b" stroke-width="7" stroke-linecap="round" />
+
+            <g class="cursor-pointer" onclick="updateMedPin('nw')">
+              <circle cx="132" cy="50" r="11" fill="#ef4444" opacity="0.35" class="pulse-hotspot" />
+              <circle cx="132" cy="50" r="6.5" fill="#dc2626" stroke="#fff" stroke-width="2" />
+              <text x="185" y="76" text-anchor="middle" fill="#78350f" font-size="10" font-weight="bold">الساحل الشمالي الغربي</text>
+            </g>
+
+            <g class="cursor-pointer" onclick="updateMedPin('cape')">
+              <circle cx="187" cy="266" r="11" fill="#d97706" opacity="0.35" class="pulse-hotspot" />
+              <circle cx="187" cy="266" r="6.5" fill="#b45309" stroke="#fff" stroke-width="2" />
+              <text x="187" y="290" text-anchor="middle" fill="#78350f" font-size="10" font-weight="bold">منطقة الكاب</text>
+            </g>
+          </svg>
+          <div id="med-pin-info" class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs sm:text-sm font-extrabold text-amber-950">
+            📍 اضغط على إحدى النقاط على الخريطة لمعرفة تفاصيل الموقع.
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs sm:text-sm font-bold text-slate-800">
+          <div class="p-4 rounded-2xl bg-sky-50 border border-sky-200 space-y-1.5">
+            <h4 class="font-black text-sky-950 text-base">☀️ ٢. الخصائص المناخية</h4>
+            <p>• <strong>حار جاف</strong> في فصل الصيف، و<strong>دافئ ممطر</strong> في فصل الشتاء.</p>
+            <p>• تقل الأمطار الساقطة على ساحل البحر المتوسط في إفريقيا كلما اتجهنا <strong>شرقاً</strong>.</p>
+            <p>• <strong>الشتاء</strong> فصل النمو الحقيقي للنباتات بسبب سقوط الأمطار واعتدال الحرارة.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-forest-50 border border-forest-200 space-y-1.5">
+            <h4 class="font-black text-forest-950 text-base">🌲 ٣. الخصائص النباتية</h4>
+            <p>• متوسطة إلى قصيرة الطول (من <strong>٥ - ٢٠ متراً</strong>).</p>
+            <p>• <strong>دائمة الخضرة طوال العام:</strong> جذورها عميقة وأوراقها صغيرة ومغطاة بطبقة شمعية لتقليل الفاقد بالنتح.</p>
+            <p>• <strong>أشهر الأشجار:</strong> الأرز — الصنوبر — البلوط الفليني.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-1">
+            <h4 class="font-black text-emerald-950 text-base">🦊 ٤. الحيوانات</h4>
+            <p>• حيوانات: الأغنام، الماعز، الثعالب، الذئاب.</p>
+            <p>• طيور تكثر بشكل واضح: النورس.</p>
+            <p>• قوارض: الفئران والسناجب.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-1.5">
+            <h4 class="font-black text-amber-950 text-base">🍇 ٦. أهمية غابات البحر المتوسط</h4>
+            <p>• <strong>اقتصادياً:</strong> نباتات عطرية وطبية، إنتاج الزيتون والموالح والعنب والتين، تربية الأغنام والماعز، والاستجمام والسياحة البيئية والصيد.</p>
+            <p>• <strong>بيئياً:</strong> امتصاص كميات كبيرة من الكربون وتحسين جودة الهواء.</p>
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-50 border-2 border-amber-300 space-y-3">
+          <h4 class="font-black text-slate-900 text-base">🌱 ٥. التربة وألوانها</h4>
+          <p class="text-xs sm:text-sm font-bold text-slate-800">
+            تتعدد ألوانها بين الأحمر والبني والأسود تبعاً لمكوناتها المعدنية والعضوية وظروف تكوينها، وهي خصبة صالحة للزراعة.
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs font-bold">
+            <div class="p-3 rounded-xl bg-slate-800 text-white">
+              <div class="font-black text-amber-300">التربة السوداء</div>
+              خصبة لارتفاع نسبة المواد العضوية المتحللة.
+            </div>
+            <div class="p-3 rounded-xl bg-red-100 text-red-950">
+              <div class="font-black">التربة الحمراء</div>
+              غنية بأكاسيد الحديد.
+            </div>
+            <div class="p-3 rounded-xl bg-amber-100 text-amber-950">
+              <div class="font-black">التربة البنية</div>
+              ترتفع بها نسبة المواد العضوية غير مكتملة التحلل.
+            </div>
+            <div class="p-3 rounded-xl bg-white text-slate-900 border border-slate-300">
+              <div class="font-black text-sky-800">التربة البيضاء</div>
+              ترتفع بها نسبة السيليكا والمواد الجيرية.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- جدول المقارنة التفاعلي -->
+      <div class="bg-white rounded-3xl p-6 shadow-md border-2 border-forest-300 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h3 class="text-xl font-black text-slate-900">مقارنة شاملة بين الغابتين</h3>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" onclick="filterComparison('all', this)" class="comp-filter-btn bg-forest-700 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl cursor-pointer">الكل</button>
+            <button type="button" onclick="filterComparison('geo', this)" class="comp-filter-btn bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold px-3 py-1.5 rounded-xl cursor-pointer">الموقع والمناخ</button>
+            <button type="button" onclick="filterComparison('bio', this)" class="comp-filter-btn bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold px-3 py-1.5 rounded-xl cursor-pointer">النبات والحيوان والتربة</button>
+            <button type="button" onclick="filterComparison('imp', this)" class="comp-filter-btn bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold px-3 py-1.5 rounded-xl cursor-pointer">الأهمية</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-right border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr class="bg-slate-900 text-white">
+                <th class="p-3 rounded-tr-2xl font-black w-1/5">وجه المقارنة</th>
+                <th class="p-3 font-black bg-forest-800 w-2/5">الغابات المدارية المطيرة</th>
+                <th class="p-3 rounded-tl-2xl font-black bg-amber-800 w-2/5">غابات البحر المتوسط</th>
+              </tr>
+            </thead>
+            <tbody id="comparison-table-body" class="divide-y divide-slate-200 font-bold text-slate-800"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="flex justify-between">
+        <button type="button" onclick="switchTab(1)" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-black px-5 py-3 rounded-2xl cursor-pointer">
+          → المحطة 2
+        </button>
+        <button type="button" onclick="switchTab(3)" class="bg-rose-600 hover:bg-rose-700 text-white font-black px-6 py-3 rounded-2xl shadow cursor-pointer">
+          التالي: الأخطار وبنك الأسئلة ←
+        </button>
+      </div>
+    </section>
+
+    <!-- المحطة 4: الأخطار وبنك الأسئلة -->
+    <section id="station-3" class="station-panel hidden fade-in space-y-6">
+      <div class="bg-gradient-to-l from-rose-800 to-red-700 text-white rounded-3xl p-6 shadow-lg">
+        <span class="bg-white/20 text-xs font-extrabold px-3 py-1 rounded-full">ثالثاً • الأخطار التي تواجه نظم الغابات في قارة إفريقيا</span>
+        <h2 class="text-2xl sm:text-3xl font-black mt-2">الأخطار وبنك الأسئلة</h2>
+        <p class="text-rose-100 text-sm font-bold mt-1">تؤدي جميع الأخطار السابقة إلى اختلال النظام البيئي</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs sm:text-sm font-bold text-slate-800">
+        <div class="bg-white rounded-3xl p-5 shadow-md border-2 border-rose-200 space-y-2">
+          <h3 class="text-lg font-black text-rose-900">🪓 ١. إزالة الغابات</h3>
+          <p>قطع الأشجار لبيع أخشابها واستخدامها كوقود، أو لتحويل أرض الغابات إلى أراضٍ زراعية؛ ونتج عن ذلك تسجيل إفريقيا أعلى معدل خسارة في مساحة الغابات عالمياً.</p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-5 shadow-md border-2 border-orange-200 space-y-2">
+          <h3 class="text-lg font-black text-orange-950">🔥 ٢. الحرائق</h3>
+          <p>تحدث بسبب التغير المناخي مثل ارتفاع الحرارة؛ وبلغت مساحة الغابات المحترقة في إفريقيا (٢٠٠١ - ٢٠١٨م) أكثر من ثلثي المساحات المحترقة في العالم.</p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-5 shadow-md border-2 border-amber-200 space-y-2">
+          <h3 class="text-lg font-black text-amber-950">🏜️ ٣. الجفاف</h3>
+          <p>تتعرض غابات البحر المتوسط في إفريقيا لحالات الجفاف بسبب قلة سقوط الأمطار في بعض السنوات، مما يؤدي لزيادة موت الأشجار وتدهور التربة.</p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-5 shadow-md border-2 border-purple-200 space-y-2">
+          <h3 class="text-lg font-black text-purple-950">🦏 ٤. الانقراض</h3>
+          <p>تتعرض أنواع كثيرة من الحيوانات لخطر الانقراض بسبب التغير المناخي والصيد الجائر والتوسع الزراعي والعمراني؛ وتؤدي كل الأخطار السابقة لاختلال النظام البيئي.</p>
+        </div>
+      </div>
+
+      <!-- بنك الأسئلة التفاعلي -->
+      <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h3 class="text-xl font-black text-slate-900">بنك الأسئلة التدريبية التفاعلية</h3>
+          <button type="button" onclick="revealAllBankAnswers()" class="bg-forest-100 hover:bg-forest-200 text-forest-900 text-xs font-extrabold px-3.5 py-2 rounded-xl cursor-pointer">
+            إظهار كل الإجابات
+          </button>
+        </div>
+        <div id="question-bank-list" class="space-y-3"></div>
+      </div>
+
+      <div class="flex justify-between">
+        <button type="button" onclick="switchTab(2)" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-black px-5 py-3 rounded-2xl cursor-pointer">
+          → المحطة 3
+        </button>
+        <button type="button" onclick="switchTab(4)" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-6 py-3 rounded-2xl shadow cursor-pointer">
+          التالي: تحدي الأبطال (12 سؤالاً) 🏆 ←
+        </button>
+      </div>
+    </section>
+
+    <!-- المحطة 5: تحدي الأبطال -->
+    <section id="station-4" class="station-panel hidden fade-in space-y-6">
+      <div class="bg-gradient-to-l from-amber-600 to-forest-700 text-white rounded-3xl p-6 shadow-lg flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <span class="bg-white/20 text-xs font-extrabold px-3 py-1 rounded-full">التقييم النهائي</span>
+          <h2 class="text-2xl sm:text-3xl font-black mt-2">تحدي الأبطال: ١٢ سؤالاً</h2>
+        </div>
+        <div class="bg-slate-950/40 px-4 py-3 rounded-2xl text-center">
+          <div class="text-xs font-bold text-amber-200">النتيجة</div>
+          <div id="challenge-live-score" class="text-2xl font-black text-white">0 / 12</div>
+        </div>
+      </div>
+
+      <div id="challenge-card" class="bg-white rounded-3xl p-6 shadow-md border-2 border-amber-300 space-y-5">
+        <div class="flex items-center justify-between gap-2">
+          <span id="challenge-q-num" class="bg-amber-100 text-amber-950 font-black text-xs sm:text-sm px-3.5 py-1.5 rounded-xl">السؤال 1 من 12</span>
+          <span id="challenge-q-type" class="bg-forest-100 text-forest-900 font-extrabold text-xs px-3 py-1 rounded-full">اختيار من متعدد</span>
+        </div>
+
+        <p id="challenge-q-text" class="text-base sm:text-lg font-black text-slate-900 leading-relaxed"></p>
+        <div id="challenge-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+        <div id="challenge-feedback" class="hidden p-4 rounded-2xl text-xs sm:text-sm font-extrabold leading-relaxed"></div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+          <button type="button" onclick="prevChallengeQ()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl cursor-pointer">
+            → السابق
+          </button>
+          <button type="button" onclick="resetChallenge()" class="bg-rose-50 hover:bg-rose-100 text-rose-800 font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl cursor-pointer">
+            إعادة التحدي
+          </button>
+          <button type="button" onclick="nextChallengeQ()" class="bg-forest-600 hover:bg-forest-700 text-white font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl cursor-pointer">
+            التالي ←
+          </button>
+        </div>
+      </div>
+
+      <!-- شهادة الإتمام -->
+      <div id="certificate-area" class="bg-white rounded-3xl p-6 sm:p-8 shadow-lg border-4 border-forest-600 text-center space-y-4">
+        <div class="text-xs font-black bg-amber-100 text-amber-900 inline-block px-4 py-1.5 rounded-full">
+          🏆 شهادة إتمام الدرس
+        </div>
+        <h3 class="text-2xl font-black text-forest-900">بطل نظم الغابات في إفريقيا</h3>
+        <div class="max-w-sm mx-auto">
+          <input type="text" id="student-name-input" placeholder="اكتب اسمك هنا..." oninput="updateCertificateName(this.value)" class="w-full text-center font-extrabold text-slate-900 bg-forest-50 border-2 border-forest-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-forest-600" />
+        </div>
+        <p class="text-sm font-bold text-slate-700 max-w-2xl mx-auto">
+          يُمنح هذا التقدير للطالب / الطالبة: <strong id="cert-student-name" class="text-forest-800 underline">بطل الدرس</strong>
+          لإتمام أنشطة درس <strong>نظم الغابات في إفريقيا</strong> بنتيجة <strong id="cert-score-label" class="text-amber-700">0 من 12</strong>.
+        </p>
+        <div class="no-print pt-1">
+          <button type="button" onclick="window.print()" class="bg-forest-700 hover:bg-forest-800 text-white font-black text-sm px-6 py-3 rounded-2xl shadow cursor-pointer">
+            طباعة الشهادة
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- نافذة الملخص السريع -->
+  <div id="quick-summary-modal" class="hidden fixed inset-0 z-50 bg-slate-950/60 flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-forest-200 space-y-4 fade-in">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-black text-forest-900">ملخص سريع للدرس</h3>
+        <button type="button" onclick="toggleModal('quick-summary-modal')" class="text-slate-500 hover:text-slate-900 font-bold text-lg cursor-pointer">✕</button>
+      </div>
+      <ul class="text-xs sm:text-sm font-bold text-slate-800 space-y-2 list-disc list-inside bg-forest-50 p-4 rounded-2xl">
+        <li><strong>النظام البيئي:</strong> تفاعل مكونات حية وغير حية لتحقيق التوازن البيئي؛ وأكبر نظام بيئي هو <strong>الغلاف الحيوي</strong>.</li>
+        <li><strong>الغابات المدارية المطيرة:</strong> (١٠° شمالاً وجنوباً) — مطر غزير طوال العام — تربتها حمراء — حوض الكونغو يمتص الكربون وينتج الأكسجين.</li>
+        <li><strong>غابات البحر المتوسط:</strong> (٣٠° - ٤٥° شمالاً وجنوباً) — حار جاف صيفاً ودافئ ممطر شتاءً — أرز وصنوبر وبلوط فليني — زيتون وموالح وعنب وتين.</li>
+        <li><strong>الأخطار:</strong> إزالة الغابات، الحرائق، الجفاف، الانقراض — وتؤدي لاختلال النظام البيئي.</li>
+      </ul>
+      <div class="flex justify-end">
+        <button type="button" onclick="toggleModal('quick-summary-modal')" class="bg-forest-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl cursor-pointer">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة تعريف الغابة -->
+  <div id="forest-def-modal" class="hidden fixed inset-0 z-50 bg-slate-950/60 flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-2 border-amber-300 space-y-4 fade-in">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-black text-amber-900">💡 ما المقصود بالغابة؟</h3>
+        <button type="button" onclick="toggleModal('forest-def-modal')" class="text-slate-500 hover:text-slate-900 font-bold text-lg cursor-pointer">✕</button>
+      </div>
+      <p class="text-sm font-extrabold text-slate-800 bg-amber-50 p-4 rounded-2xl leading-relaxed">
+        <strong>الغابة:</strong> مساحة من الأرض تزيد على <strong>خمسة آلاف متر مربع</strong>، وتنمو فيها أشجار بأطوال لا تقل عن <strong>خمسة أمتار</strong>.
+      </p>
+      <div class="flex justify-end">
+        <button type="button" onclick="toggleModal('forest-def-modal')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl cursor-pointer">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const LESSON_YOUTUBE_ID = '2mXlycB3WXc';
+    let useNoCookie = false;
+
+    const appState = {
+      xp: 10,
+      interactions: new Set(['load'])
+    };
+
+    let toastTimer = null;
+
+    function showToast(msg) {
+      const box = document.getElementById('live-toast');
+      const txt = document.getElementById('live-toast-text');
+      if (!box || !txt) return;
+      txt.textContent = msg;
+      box.classList.remove('hidden');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => hideToast(), 2800);
+    }
+
+    function hideToast() {
+      const box = document.getElementById('live-toast');
+      if (box) box.classList.add('hidden');
+    }
+
+    function updateProgressUI() {
+      const xpEl = document.getElementById('xp-counter');
+      const pctEl = document.getElementById('progress-text');
+      const barEl = document.getElementById('progress-bar');
+      const pct = Math.min(100, Math.max(10, appState.interactions.size * 5));
+      if (xpEl) xpEl.textContent = `${appState.xp} نقطة`;
+      if (pctEl) pctEl.textContent = `${pct}%`;
+      if (barEl) barEl.style.width = `${pct}%`;
+    }
+
+    function registerInteraction(key, points = 5) {
+      if (!appState.interactions.has(key)) {
+        appState.interactions.add(key);
+        appState.xp += points;
+      } else {
+        appState.xp += 1;
+      }
+      updateProgressUI();
+    }
+
+    function toggleModal(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.toggle('hidden');
+      registerInteraction(`modal_${id}`, 5);
+    }
+
+    function switchYoutubeHost() {
+      useNoCookie = !useNoCookie;
+      const iframe = document.getElementById('lesson-youtube-iframe');
+      const host = useNoCookie ? 'www.youtube-nocookie.com' : 'www.youtube.com';
+      if (iframe) {
+        iframe.src = `https://${host}/embed/${LESSON_YOUTUBE_ID}?rel=0&modestbranding=1&playsinline=1`;
+      }
+      registerInteraction('yt_host', 5);
+      showToast(useNoCookie ? 'تم التبديل إلى مشغل يوتيوب البديل.' : 'تم التبديل إلى مشغل يوتيوب الأساسي.');
+    }
+
+    function switchTab(index) {
+      registerInteraction(`tab_${index}`, 5);
+      document.querySelectorAll('.station-panel').forEach((panel, idx) => {
+        panel.classList.toggle('hidden', idx !== index);
+      });
+      document.querySelectorAll('.nav-tab').forEach((btn, idx) => {
+        if (idx === index) {
+          btn.className = 'nav-tab flex-shrink-0 px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-forest-600 text-white shadow cursor-pointer';
+        } else {
+          btn.className = 'nav-tab flex-shrink-0 px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-slate-100 text-slate-700 hover:bg-forest-50 cursor-pointer';
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleEcosystemExample() {
+      const box = document.getElementById('eco-example-box');
+      const lbl = document.getElementById('eco-example-toggle-icon');
+      if (!box || !lbl) return;
+      const show = box.classList.contains('hidden');
+      box.classList.toggle('hidden', !show);
+      lbl.textContent = show ? 'إخفاء المثال' : 'عرض المثال';
+      registerInteraction('eco_ex', 5);
+    }
+
+    const CLASSIFIER_ITEMS = [
+      { id: 'c1', label: '🌳 الأشجار والنباتات', type: 'biotic' },
+      { id: 'c2', label: '🐒 القردة والحيوانات', type: 'biotic' },
+      { id: 'c3', label: '🦠 الفطريات والبكتيريا', type: 'biotic' },
+      { id: 'c4', label: '💧 المياه والأمطار', type: 'abiotic' },
+      { id: 'c5', label: '🌡️ الحرارة والرطوبة والرياح', type: 'abiotic' },
+      { id: 'c6', label: '🪨 التربة والصخور', type: 'abiotic' },
+      { id: 'c7', label: '⛰️ التضاريس', type: 'abiotic' }
+    ];
+
+    let selectedClassifierId = null;
+    let classifiedMap = {};
+
+    function renderClassifier() {
+      const bank = document.getElementById('classifier-bank');
+      const bBiotic = document.getElementById('bucket-biotic');
+      const bAbiotic = document.getElementById('bucket-abiotic');
+      if (!bank || !bBiotic || !bAbiotic) return;
+
+      bank.innerHTML = '';
+      bBiotic.innerHTML = '';
+      bAbiotic.innerHTML = '';
+
+      CLASSIFIER_ITEMS.forEach((item) => {
+        const placed = classifiedMap[item.id];
+        if (!placed) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          const isSel = selectedClassifierId === item.id;
+          btn.className = `px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold border-2 transition cursor-pointer ${
+            isSel ? 'bg-indigo-600 text-white border-indigo-700' : 'bg-white hover:bg-indigo-50 text-slate-800 border-slate-300'
+          }`;
+          btn.textContent = item.label;
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            selectedClassifierId = item.id;
+            renderClassifier();
+          };
+          bank.appendChild(btn);
+        } else {
+          const chip = document.createElement('span');
+          chip.className = 'px-3 py-1.5 rounded-xl text-xs font-extrabold bg-white text-slate-900 border border-slate-300';
+          chip.textContent = item.label;
+          if (placed === 'biotic') bBiotic.appendChild(chip);
+          else bAbiotic.appendChild(chip);
+        }
+      });
+
+      const scoreEl = document.getElementById('classifier-score');
+      if (scoreEl) scoreEl.textContent = `تم تصنيف: ${Object.keys(classifiedMap).length} / ${CLASSIFIER_ITEMS.length}`;
+    }
+
+    function dropIntoBucket(targetType) {
+      const fb = document.getElementById('classifier-feedback');
+      if (!fb) return;
+      if (!selectedClassifierId) {
+        fb.className = 'text-center text-sm font-extrabold py-2.5 px-4 rounded-xl bg-amber-100 text-amber-950';
+        fb.textContent = 'اختر عنصراً أولاً من البنك ثم اضغط على السلة المناسبة.';
+        fb.classList.remove('hidden');
+        return;
+      }
+      const item = CLASSIFIER_ITEMS.find((x) => x.id === selectedClassifierId);
+      if (item && item.type === targetType) {
+        classifiedMap[item.id] = targetType;
+        selectedClassifierId = null;
+        registerInteraction(`class_${item.id}`, 5);
+        fb.className = 'text-center text-sm font-extrabold py-2.5 px-4 rounded-xl bg-emerald-100 text-emerald-950';
+        fb.textContent = `✅ أحسنت! «${item.label}» تصنيفه صحيح.`;
+      } else {
+        fb.className = 'text-center text-sm font-extrabold py-2.5 px-4 rounded-xl bg-rose-100 text-rose-950';
+        fb.textContent = '❌ حاول مرة أخرى في السلة الصحيحة.';
+      }
+      fb.classList.remove('hidden');
+      renderClassifier();
+    }
+
+    function resetClassifier() {
+      selectedClassifierId = null;
+      classifiedMap = {};
+      const fb = document.getElementById('classifier-feedback');
+      if (fb) fb.classList.add('hidden');
+      renderClassifier();
+    }
+
+    function toggleAccordion(bodyId, iconId) {
+      const body = document.getElementById(bodyId);
+      const icon = document.getElementById(iconId);
+      if (!body) return;
+      const show = body.classList.contains('hidden');
+      body.classList.toggle('hidden', !show);
+      if (icon) icon.className = show ? 'fa-solid fa-chevron-up text-sm' : 'fa-solid fa-chevron-down text-sm';
+    }
+
+    function showSizeDetail(kind) {
+      const banner = document.getElementById('size-detail-banner');
+      if (!banner) return;
+      registerInteraction(`size_${kind}`, 5);
+      if (kind === 'small') banner.textContent = '💧 بركة المياه: مثال على نظام بيئي صغير المساحة.';
+      else if (kind === 'large') banner.textContent = '🌴 نظام الغابات المدارية المطيرة: مثال على نظام بيئي كبير المساحة.';
+      else banner.textContent = '🌍 الغلاف الحيوي للأرض: يُعد أكبر النظم البيئية على الإطلاق.';
+    }
+
+    function triggerDisruption(kind, text) {
+      registerInteraction(`disrupt_${kind}`, 5);
+      const beam = document.getElementById('balance-beam');
+      const box = document.getElementById('balance-status-box');
+      if (beam) beam.style.transform = kind === 'human' ? 'rotate(14deg)' : 'rotate(-14deg)';
+      if (box) {
+        box.className = 'mt-2 text-center bg-rose-100 text-rose-950 border border-rose-300 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-black w-full';
+        box.textContent = `⚠️ ${text}`;
+      }
+    }
+
+    function restoreEcoBalance() {
+      const beam = document.getElementById('balance-beam');
+      const box = document.getElementById('balance-status-box');
+      if (beam) beam.style.transform = 'rotate(0deg)';
+      if (box) {
+        box.className = 'mt-2 text-center bg-emerald-100 text-emerald-900 border border-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-black w-full';
+        box.textContent = '✅ النظام البيئي في حالة توازن واستقرار';
+      }
+      showToast('تمت استعادة التوازن البيئي.');
+    }
+
+    function updateTropicalPin(pin) {
+      registerInteraction(`trop_${pin}`, 5);
+      const info = document.getElementById('tropical-pin-info');
+      const map = {
+        congo: '📍 وسط القارة: بشمال حوض نهر الكونغو.',
+        ghana: '📍 غرب القارة: بساحل غانا.',
+        madagascar: '📍 منطقة بعيدة نسبياً عن دائرة الاستواء: الجزء الشرقي من جزيرة مدغشقر.'
+      };
+      if (info) info.textContent = map[pin] || '';
+    }
+
+    function updateMedPin(pin) {
+      registerInteraction(`med_${pin}`, 5);
+      const info = document.getElementById('med-pin-info');
+      const map = {
+        nw: '📍 الساحل الشمالي الغربي لإفريقيا.',
+        cape: '📍 منطقة الكاب أقصى جنوب قارة إفريقيا.'
+      };
+      if (info) info.textContent = map[pin] || '';
+    }
+
+    const COMPARISON_ROWS = [
+      {
+        cat: 'geo',
+        label: 'الموقع الفلكي والجغرافي',
+        tropical: 'بين ١٠° شمالاً و١٠° جنوباً؛ شمال حوض نهر الكونغو، ساحل غانا، وشرق مدغشقر.',
+        med: 'بين ٣٠° و٤٥° شمالاً وجنوباً؛ الساحل الشمالي الغربي لإفريقيا ومنطقة الكاب أقصى الجنوب.'
+      },
+      {
+        cat: 'geo',
+        label: 'المناخ',
+        tropical: 'مطر غزير طوال العام، حرارة مرتفعة (انخفاض المدى الحراري السنوي)، ضغط منخفض، ورطوبة مرتفعة.',
+        med: 'حار جاف صيفاً، دافئ ممطر شتاءً (الشتاء فصل النمو الحقيقي)، وتقل الأمطار شرقاً.'
+      },
+      {
+        cat: 'bio',
+        label: 'النباتات',
+        tropical: 'كثيفة ومتشابكة الأغصان وتكثر المتسلقات والطفليات؛ أشهرها: الماهوجني، الأبنوس، المطاط، الكاكاو، الموز.',
+        med: 'متوسطة إلى قصيرة الطول (٥ - ٢٠ م)، دائمة الخضرة (جذور عميقة وطبقة شمعية)؛ أشهرها: الأرز، الصنوبر، البلوط الفليني.'
+      },
+      {
+        cat: 'bio',
+        label: 'الحيوانات',
+        tropical: 'قردة ونمور، تماسيح وأفاعي، نمل أبيض؛ وتندر الحيوانات الضخمة آكلة العشب لصعوبة حركتها.',
+        med: 'أغنام، ماعز، ثعالب، ذئاب؛ طيور كالنورس، وقوارض كالفئران والسناجب.'
+      },
+      {
+        cat: 'bio',
+        label: 'التربة',
+        tropical: 'معظمها حمراء اللون لغناها بأكاسيد الحديد وفقيرة بالأملاح الذائبة.',
+        med: 'تتعدد ألوانها بين الأحمر والبني والأسود حسب المكونات وظروف التكوين، وخصبة صالحة للزراعة.'
+      },
+      {
+        cat: 'imp',
+        label: 'الأهمية الاقتصادية والبيئية',
+        tropical: 'أدوية، أخشاب، مطاط، غذاء ووقود، سياحة؛ وتحافظ على التوازن البيئي وتمتص الكربون (حوض الكونغو).',
+        med: 'نباتات عطرية وطبية، زيتون وموالح وعنب وتين، أغنام وماعز وسياحة بيئية؛ وتمتص الكربون وتحسن جودة الهواء.'
+      }
+    ];
+
+    function renderComparisonTable(mode = 'all') {
+      const tbody = document.getElementById('comparison-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      const rows = mode === 'all' ? COMPARISON_ROWS : COMPARISON_ROWS.filter((r) => r.cat === mode);
+      rows.forEach((row) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-3 bg-slate-50 font-black text-slate-900">${row.label}</td>
+          <td class="p-3 bg-forest-50/40">${row.tropical}</td>
+          <td class="p-3 bg-amber-50/40">${row.med}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterComparison(mode, btnEl) {
+      document.querySelectorAll('.comp-filter-btn').forEach((b) => {
+        b.className = 'comp-filter-btn bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold px-3 py-1.5 rounded-xl cursor-pointer';
+      });
+      if (btnEl) {
+        btnEl.className = 'comp-filter-btn bg-forest-700 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl cursor-pointer';
+      }
+      registerInteraction(`comp_${mode}`, 5);
+      renderComparisonTable(mode);
+    }
+
+    const QUESTION_BANK = [
+      {
+        q: 'بم تفسر: كثرة النباتات المتسلقة والطفيلية في الغابات المدارية المطيرة؟',
+        a: 'لأن أشجارها كثيفة ومتشابكة الأغصان مما يمنع الضوء من الوصول إلى أرض الغابة.'
+      },
+      {
+        q: 'بم تفسر: تندر الحيوانات الضخمة آكلة العشب في الغابات المدارية المطيرة؟',
+        a: 'بسبب صعوبة تحركها بين أشجار الغابة الكثيفة والمتشابكة.'
+      },
+      {
+        q: 'بم تفسر: معظم تربة الغابات المدارية المطيرة حمراء اللون؟',
+        a: 'لأنها غنية بأكاسيد الحديد وفقيرة في الأملاح المعدنية القابلة للذوبان.'
+      },
+      {
+        q: 'بم تفسر: أشجار غابات البحر المتوسط دائمة الخضرة طوال العام؟',
+        a: 'لأنها تتكيف مع الظروف المناخية من خلال جذورها العميقة، وأوراقها صغيرة الحجم المغطاة بطبقة شمعية لتقليل الفاقد بالنتح.'
+      },
+      {
+        q: 'ما النتائج المترتبة على: ارتفاع درجات الحرارة طوال العام في الغابات المدارية المطيرة؟',
+        a: 'ترتب على ذلك انخفاض المدى الحراري السنوي.'
+      },
+      {
+        q: 'دلل على: أهمية غابات حوض نهر الكونغو البيئية.',
+        a: 'تمتص انبعاثات الكربون بكمية أكبر من تلك الصادرة عن قارة إفريقيا بأكملها، كما تنتج كميات كبيرة من الأكسجين.'
+      }
+    ];
+
+    let revealedBankSet = new Set();
+
+    function renderQuestionBank() {
+      const list = document.getElementById('question-bank-list');
+      if (!list) return;
+      list.innerHTML = '';
+      QUESTION_BANK.forEach((item, idx) => {
+        const open = revealedBankSet.has(idx);
+        const card = document.createElement('div');
+        card.className = 'p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5';
+        card.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <p class="text-xs sm:text-sm font-black text-slate-900">${idx + 1}. ${item.q}</p>
+            <button type="button" onclick="toggleBankAnswer(${idx})" class="bg-forest-600 hover:bg-forest-700 text-white text-xs font-extrabold px-3 py-1 rounded-lg cursor-pointer">
+              ${open ? 'إخفاء الإجابة' : 'إظهار الإجابة'}
+            </button>
+          </div>
+          <div class="${open ? '' : 'hidden'} p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs sm:text-sm font-bold text-emerald-950">
+            ✅ <strong>الإجابة النموذجية:</strong> ${item.a}
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    function toggleBankAnswer(idx) {
+      if (revealedBankSet.has(idx)) revealedBankSet.delete(idx);
+      else {
+        revealedBankSet.add(idx);
+        registerInteraction(`bank_${idx}`, 5);
+      }
+      renderQuestionBank();
+    }
+
+    function revealAllBankAnswers() {
+      QUESTION_BANK.forEach((_, i) => revealedBankSet.add(i));
+      registerInteraction('bank_all', 10);
+      renderQuestionBank();
+    }
+
+    const CHALLENGE_QUESTIONS = [
+      {
+        type: 'اختيار من متعدد',
+        q: 'منطقة جغرافية متكاملة تضم مكونات حية وغير حية تتفاعل مع بعضها للحفاظ على التوازن البيئي هي:',
+        options: ['الغلاف الصخري', 'النظام البيئي', 'الإقليم المناخي', 'النظام البشري فقط'],
+        correct: 1,
+        explain: 'النظام البيئي منطقة جغرافية متكاملة تضم مكونات حية وغير حية تتفاعل للحفاظ على التوازن البيئي.'
+      },
+      {
+        type: 'اختيار من متعدد',
+        q: 'أكبر النظم البيئية على سطح الأرض هو:',
+        options: ['بركة المياه', 'الغابات المدارية المطيرة', 'الغلاف الحيوي', 'الأراضي الزراعية'],
+        correct: 2,
+        explain: 'يُعد الغلاف الحيوي للأرض أكبر النظم البيئية.'
+      },
+      {
+        type: 'صواب أم خطأ',
+        q: 'تُعد الزلازل والثورانات البركانية والأعاصير من الأسباب البشرية لاختلال التوازن البيئي.',
+        options: ['صواب', 'خطأ'],
+        correct: 1,
+        explain: 'خطأ؛ فهي من الأسباب الطبيعية.'
+      },
+      {
+        type: 'اختيار من متعدد',
+        q: 'يمتد نظام الغابات المدارية المطيرة في إفريقيا بشكل رئيسي بين دائرتي عرض:',
+        options: ['٣٠° و٤٥° شمالاً وجنوباً', '١٠° شمالاً و١٠° جنوباً', '٢٠° و٣٠° جنوباً', '١٥° و٢٥° شمالاً'],
+        correct: 1,
+        explain: 'يمتد بين دائرتي عرض ١٠° شمالاً و١٠° جنوباً.'
+      },
+      {
+        type: 'اختيار من متعدد',
+        q: 'توجد الغابات المدارية المطيرة في وسط إفريقيا بشمال حوض نهر:',
+        options: ['النيل', 'الكونغو', 'السنغال', 'الزامبيزي'],
+        correct: 1,
+        explain: 'توجد في وسط القارة بشمال حوض نهر الكونغو.'
+      },
+      {
+        type: 'اختيار من متعدد',
+        q: 'ترتب على ارتفاع درجات الحرارة طوال العام في الغابات المدارية المطيرة:',
+        options: ['انخفاض المدى الحراري السنوي', 'تجمد التربة شتاءً', 'ندرة الأمطار طوال العام', 'اختفاء الأشجار'],
+        correct: 0,
+        explain: 'ترتب على ذلك انخفاض المدى الحراري السنوي.'
+      },
+      {
+        type: 'اختيار من متعدد',
+        q: 'تندر الحيوانات الضخمة آكلة العشب في الغابات المدارية المطيرة بسبب:',
+        options: ['شدة البرودة', 'صعوبة تحركها بين أشجار الغابة', 'عدم وجود ماء', 'كثرة الثلوج'],
+        correct: 1,
+        explain: 'بسبب صعوبة تحركها بين أشجار الغابة الكثيفة والمتشابكة.'
+      },
+      {
+        type: 'اختيار من متعدد',
+        q: 'يمتد نظام غابات البحر المتوسط بين دائرتي عرض:',
+        options: ['٠° و١٠° شمالاً وجنوباً', '٣٠° و٤٥° شمالاً وجنوباً', '٥° و١٥° جنوباً', '٥٠° و٦٠° شمالاً'],
+        correct: 1,
+        explain: 'يمتد بين دائرتي عرض ٣٠° و٤٥° شمالاً وجنوباً.'
+      },
+      {
+        type: 'اختيار من متعدد',
+        q: 'يُعد فصل النمو الحقيقي للنباتات في نظام غابات البحر المتوسط هو فصل:',
+        options: ['الصيف الحار الجاف', 'الشتاء الدافئ الممطر', 'الخريف', 'الربيع فقط'],
+        correct: 1,
+        explain: 'الشتاء هو فصل النمو الحقيقي للنباتات بسبب سقوط الأمطار واعتدال الحرارة.'
+      },
+      {
+        type: 'اختيار من متعدد',
+        q: 'من أشهر أشجار غابات البحر المتوسط:',
+        options: ['الأرز والصنوبر والبلوط الفليني', 'الماهوجني والمطاط', 'الكاكاو والموز', 'البردي والسنط'],
+        correct: 0,
+        explain: 'من أشهر أشجارها: الأرز والصنوبر والبلوط الفليني.'
+      },
+      {
+        type: 'اختيار من متعدد',
+        q: 'تربة غنية بأكاسيد الحديد وتوجد في الغابات المدارية المطيرة هي التربة:',
+        options: ['البيضاء', 'الحمراء', 'السوداء', 'الجيرية'],
+        correct: 1,
+        explain: 'معظم تربة الغابات المدارية المطيرة حمراء اللون لغناها بأكاسيد الحديد.'
+      },
+      {
+        type: 'اختيار من متعدد',
+        q: 'تتعرض غابات البحر المتوسط في إفريقيا لحالات الجفاف بسبب:',
+        options: ['قلة سقوط الأمطار في بعض السنوات', 'زيادة الأنهار الجليدية', 'كثرة الفيضانات', 'انخفاض الحرارة جداً'],
+        correct: 0,
+        explain: 'بسبب قلة سقوط الأمطار في بعض السنوات.'
+      }
+    ];
+
+    let challengeIdx = 0;
+    let challengeAnswers = Array(CHALLENGE_QUESTIONS.length).fill(null);
+
+    function renderChallenge() {
+      const qObj = CHALLENGE_QUESTIONS[challengeIdx];
+      const userAns = challengeAnswers[challengeIdx];
+
+      document.getElementById('challenge-q-num').textContent = `السؤال ${challengeIdx + 1} من ${CHALLENGE_QUESTIONS.length}`;
+      document.getElementById('challenge-q-type').textContent = qObj.type;
+      document.getElementById('challenge-q-text').textContent = qObj.q;
+
+      const optsBox = document.getElementById('challenge-options');
+      optsBox.innerHTML = '';
+
+      qObj.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = opt;
+        let cls = 'w-full text-right p-3.5 rounded-2xl border-2 text-xs sm:text-sm font-extrabold transition cursor-pointer ';
+
+        if (userAns === null) {
+          cls += 'bg-slate-50 hover:bg-amber-50 border-slate-200 hover:border-amber-400 text-slate-900';
+        } else if (i === qObj.correct) {
+          cls += 'bg-emerald-100 border-emerald-600 text-emerald-950';
+        } else if (i === userAns) {
+          cls += 'bg-rose-100 border-rose-600 text-rose-950';
+        } else {
+          cls += 'bg-slate-50 border-slate-200 text-slate-400';
+        }
+
+        btn.className = cls;
+        btn.onclick = () => pickChallengeOption(i);
+        optsBox.appendChild(btn);
+      });
+
+      const fb = document.getElementById('challenge-feedback');
+      if (userAns !== null) {
+        fb.classList.remove('hidden');
+        if (userAns === qObj.correct) {
+          fb.className = 'p-4 rounded-2xl text-xs sm:text-sm font-extrabold leading-relaxed bg-emerald-50 text-emerald-950 border border-emerald-300';
+          fb.innerHTML = `✅ <strong>إجابة صحيحة!</strong> ${qObj.explain}`;
+        } else {
+          fb.className = 'p-4 rounded-2xl text-xs sm:text-sm font-extrabold leading-relaxed bg-rose-50 text-rose-950 border border-rose-300';
+          fb.innerHTML = `❌ <strong>إجابة غير صحيحة.</strong> ${qObj.explain}`;
+        }
+      } else {
+        fb.classList.add('hidden');
+      }
+
+      const score = challengeAnswers.reduce((acc, a, i) => acc + (a === CHALLENGE_QUESTIONS[i].correct ? 1 : 0), 0);
+      document.getElementById('challenge-live-score').textContent = `${score} / ${CHALLENGE_QUESTIONS.length}`;
+      document.getElementById('cert-score-label').textContent = `${score} من ${CHALLENGE_QUESTIONS.length}`;
+    }
+
+    function pickChallengeOption(optIdx) {
+      const wasAnswered = challengeAnswers[challengeIdx] !== null;
+      challengeAnswers[challengeIdx] = optIdx;
+      if (!wasAnswered && optIdx === CHALLENGE_QUESTIONS[challengeIdx].correct) {
+        registerInteraction(`ch_${challengeIdx}`, 10);
+      }
+      renderChallenge();
+    }
+
+    function nextChallengeQ() {
+      challengeIdx = (challengeIdx + 1) % CHALLENGE_QUESTIONS.length;
+      renderChallenge();
+    }
+
+    function prevChallengeQ() {
+      challengeIdx = (challengeIdx - 1 + CHALLENGE_QUESTIONS.length) % CHALLENGE_QUESTIONS.length;
+      renderChallenge();
+    }
+
+    function resetChallenge() {
+      challengeAnswers = Array(CHALLENGE_QUESTIONS.length).fill(null);
+      challengeIdx = 0;
+      renderChallenge();
+      showToast('تمت إعادة ضبط التحدي.');
+    }
+
+    function updateCertificateName(val) {
+      document.getElementById('cert-student-name').textContent = val.trim() || 'بطل الدرس';
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateProgressUI();
+      renderClassifier();
+      renderComparisonTable('all');
+      renderQuestionBank();
+      renderChallenge();
+    });
+  </script>
+</body>
+</html>
